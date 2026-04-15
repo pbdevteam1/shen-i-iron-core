@@ -3,7 +3,6 @@ import { Mail, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,37 +35,80 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen" dir={dir}>
+    <div className="min-h-screen bg-[hsl(210,25%,8%)]" dir={dir}>
       <Header />
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-b from-primary/10 to-background px-4">
-        <Card className="w-full max-w-md border-border bg-card shadow-xl">
-          <CardHeader className="text-center">
-            <img src={logo} alt="מי עירון" className="mx-auto mb-4 h-20 w-auto object-contain" />
-            <CardTitle className="text-2xl font-bold text-foreground">{t('login.title')}</CardTitle>
-            <CardDescription className="text-muted-foreground">{t('app.subtitle')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          {/* Card */}
+          <div className="rounded-2xl border border-[hsl(210,20%,18%)] bg-[hsl(210,22%,12%)] p-8 shadow-2xl shadow-black/40">
+            {/* Logo */}
+            <div className="mb-6 flex justify-center">
+              <img src={logo} alt="מי עירון" className="h-24 w-auto object-contain drop-shadow-lg" />
+            </div>
+
+            {/* Title */}
+            <h1 className="mb-1 text-center text-2xl font-bold text-white">
+              {t('login.title')}
+            </h1>
+            <p className="mb-8 text-center text-sm text-[hsl(210,15%,55%)]">
+              {t('app.subtitle')}
+            </p>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">{t('login.email')}</Label>
+                <Label htmlFor="email" className="text-[hsl(210,15%,70%)]">
+                  {t('login.email')}
+                </Label>
                 <div className="relative">
-                  <Mail className="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ltr:left-3 rtl:right-3" />
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('login.email')} className="ltr:pl-10 rtl:pr-10" required />
+                  <Mail className="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(210,15%,45%)] ltr:left-3 rtl:right-3" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t('login.email')}
+                    className="flex h-12 w-full rounded-lg border border-[hsl(210,20%,22%)] bg-[hsl(210,25%,8%)] px-3 py-2 text-sm text-white placeholder:text-[hsl(210,15%,35%)] focus:border-[hsl(207,78%,45%)] focus:outline-none focus:ring-1 focus:ring-[hsl(207,78%,45%)] ltr:pl-10 rtl:pr-10"
+                    required
+                  />
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="password">{t('login.password')}</Label>
+                <Label htmlFor="password" className="text-[hsl(210,15%,70%)]">
+                  {t('login.password')}
+                </Label>
                 <div className="relative">
-                  <Lock className="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ltr:left-3 rtl:right-3" />
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('login.password')} className="ltr:pl-10 rtl:pr-10" required />
+                  <Lock className="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(210,15%,45%)] ltr:left-3 rtl:right-3" />
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('login.password')}
+                    className="flex h-12 w-full rounded-lg border border-[hsl(210,20%,22%)] bg-[hsl(210,25%,8%)] px-3 py-2 text-sm text-white placeholder:text-[hsl(210,15%,35%)] focus:border-[hsl(207,78%,45%)] focus:outline-none focus:ring-1 focus:ring-[hsl(207,78%,45%)] ltr:pl-10 rtl:pr-10"
+                    required
+                  />
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />{t('login.loading')}</>) : t('login.submit')}
+
+              <Button
+                type="submit"
+                className="h-12 w-full rounded-lg bg-[hsl(207,78%,50%)] text-base font-semibold text-white hover:bg-[hsl(207,78%,55%)] transition-colors"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('login.loading')}
+                  </>
+                ) : (
+                  t('login.submit')
+                )}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
