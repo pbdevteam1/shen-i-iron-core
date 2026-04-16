@@ -39,13 +39,17 @@ const SettingsTab: React.FC = () => {
       toast({ title: t('settings.error'), description: t('settings.email_exists'), variant: 'destructive' });
       return;
     }
-    setNotificationEmails([...notificationEmails, email]);
+    const updated = [...notificationEmails, email];
+    setNotificationEmails(updated);
+    localStorage.setItem('meieiron_notify_emails', JSON.stringify(updated));
     setNewEmail('');
     toast({ title: t('settings.saved'), description: t('settings.email_added') });
   };
 
   const handleRemoveEmail = (email: string) => {
-    setNotificationEmails(notificationEmails.filter(e => e !== email));
+    const updated = notificationEmails.filter(e => e !== email);
+    setNotificationEmails(updated);
+    localStorage.setItem('meieiron_notify_emails', JSON.stringify(updated));
   };
 
   const handleRegister = async () => {
