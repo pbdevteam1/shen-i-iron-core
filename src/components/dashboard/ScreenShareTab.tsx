@@ -122,9 +122,7 @@ const ScreenShareTab: React.FC = () => {
   }, []);
 
   const handleJoin = async (v: Visitor) => {
-    const visitorId = v.unique_id || v.short_id;
-
-    if (!visitorId || !v.short_id) {
+    if (!v.short_id) {
       toast({ title: 'חסר מזהה visitor', variant: 'destructive' });
       return;
     }
@@ -133,7 +131,7 @@ const ScreenShareTab: React.FC = () => {
       toast({ title: 'לא מחובר', variant: 'destructive' });
       return;
     }
-    setJoiningId(visitorId);
+    setJoiningId(v.short_id);
     try {
       const origin = window.location.origin;
       const identity = getIdentity(v);
@@ -143,7 +141,6 @@ const ScreenShareTab: React.FC = () => {
       const agentName = user?.name ?? 'Agent';
 
       const body = {
-        short_id: v.short_id,
         agent: { id: agentId, name: agentName },
         branding: {
           naked: true,
@@ -180,16 +177,17 @@ const ScreenShareTab: React.FC = () => {
           hide_private_details: false,
         },
         language: 'he',
+        webhook_url: 'https://testapis-pb.api-connect.co.il/webhook',
       };
 
       const res = await fetch(
-        `${API_BASE_URL}/WCP/visitors/${visitorId}/watch_url`,
+        `${API_BASE_URL}/WCP/visitors/${v.short_id}/watch_url`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             realm: 'meieiron',
-            'access-token': token,
+            'x-api-key': token,
           },
           body: JSON.stringify(body),
         },
