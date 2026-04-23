@@ -37,10 +37,6 @@ interface Visitor {
   watch_link?: string;
 }
 
-interface OnlineVisitorEntry {
-  visitor: Visitor;
-}
-
 const API_BASE_URL = 'https://testapis-pb.api-connect.co.il';
 
 const formatTimeAgo = (iso?: string) => {
@@ -86,9 +82,7 @@ const ScreenShareTab: React.FC = () => {
         return;
       }
       const data = await response.json();
-      const list: Visitor[] = Array.isArray(data)
-        ? data.map((entry: OnlineVisitorEntry) => entry?.visitor).filter(Boolean)
-        : [];
+      const list: Visitor[] = Array.isArray(data) ? data : [];
       setVisitors(list);
     } catch {
       setError('שגיאה בתקשורת עם השרת');
