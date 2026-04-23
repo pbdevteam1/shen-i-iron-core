@@ -79,10 +79,12 @@ const getLocation = (v: Visitor): string =>
 
 const ScreenShareTab: React.FC = () => {
   const { t, dir } = useLanguage();
+  const { user } = useAuth();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [joiningId, setJoiningId] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
   const load = useCallback(async () => {
