@@ -121,6 +121,94 @@ const ScreenShareTab: React.FC = () => {
     }
   }, []);
 
+  const handleJoin = async (v: Visitor) => {
+    if (!v.short_id) {
+      toast({ title: 'חסר מזהה visitor', variant: 'destructive' });
+      return;
+    }
+    const token = getStoredToken();
+    if (!token) {
+      toast({ title: 'לא מחובר', variant: 'destructive' });
+      return;
+    }
+    setJoiningId(v.unique_id || v.short_id);
+    try {
+      const origin = window.location.origin;
+      const identity = getIdentity(v);
+      const location = getLocation(v);
+      const now = new Date().toISOString();
+      const agentId = user?.email ?? 'agent';
+      const agentName = user?.name ?? 'Agent';
+
+      const body = {
+        short_id: v.short_id,
+        agent: { id: agentId, name: agentName },
+        branding: {
+          naked: true,
+          on_end_url: `${origin}/`,
+          retry_url: `${origin}/`,
+        },
+        initial_notes: `Session with ${identity}\nLocation: ${location}\nIP: ${v.ip_address}\nStarted at: ${now}`,
+        metadata: {
+          customer_id: v.unique_id,
+          customer_email: v.email || identity,
+          customer_location: location,
+          customer_ip: v.ip_address,
+          current_url: v.last_url,
+          browser: v.browser_name,
+          os: v.device_name,
+          department: 'support',
+          priority: 'normal',
+          session_type: 'cobrowsing',
+          session_started_at: now,
+          last_activity: v.last_seen_at,
+        },
+        permissions: {
+          allow_agent_redirect: true,
+          allow_audio: true,
+          allow_click: true,
+          allow_console: false,
+          allow_draw: true,
+          allow_scroll: true,
+          allow_type: true,
+          allow_confetti: true,
+          allow_notes: true,
+          allow_show_agent_screen: true,
+          allow_request_visitor_screen: true,
+          hide_private_details: false,
+        },
+        language: 'he',
+      };
+
+      const res = await fetch(`${API_BASE_URL}/WCP/getWatchUrl`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          realm: 'meieiron',
+          'access-token': token,
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast({ title: data.message || 'שגיאה בהתחברות לסשן', variant: 'destructive' });
+        return;
+      }
+      const data = await res.json();
+      const watchUrl: string | undefined = data.watch_url || data.watchUrl || data.url;
+      if (watchUrl) {
+        window.open(watchUrl, '_blank', 'noopener,noreferrer');
+        toast({ title: 'מתחבר לסשן', description: identity });
+      } else {
+        toast({ title: 'לא התקבל קישור צפייה', variant: 'destructive' });
+      }
+    } catch {
+      toast({ title: 'שגיאה בתקשורת עם השרת', variant: 'destructive' });
+    } finally {
+      setJoiningId(null);
+    }
+  };
+
   useEffect(() => {
     load();
     const id = setInterval(load, POLL_INTERVAL);
