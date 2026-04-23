@@ -154,7 +154,7 @@ const ScreenShareTab: React.FC = () => {
                       <Badge variant="destructive" className="text-[10px]">ממתין לשיחה</Badge>
                     )}
                     {v.is_in_session && (
-                      <Badge className="bg-green-500 text-[10px] text-white hover:bg-green-600">בשיחה</Badge>
+                      <Badge className="bg-success text-[10px] text-success-foreground hover:bg-success/90">בשיחה</Badge>
                     )}
                   </div>
                 </div>
