@@ -191,11 +191,17 @@ const ScreenShareTab: React.FC = () => {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        // Fallback to static watch_link if endpoint not yet implemented
+        if (v.watch_link) {
+          window.open(v.watch_link, '_blank', 'noopener,noreferrer');
+          toast({ title: 'נפתח קישור צפייה (fallback)', description: identity });
+          return;
+        }
         toast({ title: data.message || 'שגיאה בהתחברות לסשן', variant: 'destructive' });
         return;
       }
       const data = await res.json();
-      const watchUrl: string | undefined = data.watch_url || data.watchUrl || data.url;
+      const watchUrl: string | undefined = data.watch_url || data.watchUrl || data.url || v.watch_link;
       if (watchUrl) {
         window.open(watchUrl, '_blank', 'noopener,noreferrer');
         toast({ title: 'מתחבר לסשן', description: identity });
@@ -203,7 +209,13 @@ const ScreenShareTab: React.FC = () => {
         toast({ title: 'לא התקבל קישור צפייה', variant: 'destructive' });
       }
     } catch {
-      toast({ title: 'שגיאה בתקשורת עם השרת', variant: 'destructive' });
+      // Network/CORS error – fallback to static watch_link
+      if (v.watch_link) {
+        window.open(v.watch_link, '_blank', 'noopener,noreferrer');
+        toast({ title: 'נפתח קישור צפייה (fallback)', description: getIdentity(v) });
+      } else {
+        toast({ title: 'שגיאה בתקשורת עם השרת', variant: 'destructive' });
+      }
     } finally {
       setJoiningId(null);
     }
