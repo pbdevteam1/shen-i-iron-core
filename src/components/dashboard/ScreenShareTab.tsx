@@ -334,6 +334,7 @@ const ScreenShareTab: React.FC = () => {
   const align = dir === 'rtl' ? 'text-right' : 'text-left';
 
   return (
+    <div className="space-y-6">
     <Card className="border-border bg-card shadow-sm">
       <CardContent className="py-4">
         {/* Search + refresh */}
