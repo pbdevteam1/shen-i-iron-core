@@ -524,7 +524,7 @@ const ScreenShareTab: React.FC = () => {
                 <TableRow className="border-border bg-primary/10">
                   <TableHead className={`${align} font-bold text-foreground`}>קוד זיהוי</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>תאריך פתיחה</TableHead>
-                  <TableHead className={`${align} font-bold text-foreground`}>זמן שעבר</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>זמן שעבר מפתיחה</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>סטטוס</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>עיר</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>פעולות</TableHead>
