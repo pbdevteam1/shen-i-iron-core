@@ -344,6 +344,12 @@ const ScreenShareTab: React.FC = () => {
         )}
 
         {/* Table */}
+        {visitors.length === 0 ? (
+          <div className="flex min-h-[120px] flex-col items-center justify-center text-sm text-muted-foreground">
+            <Monitor className="mb-2 h-8 w-8" />
+            {t('screen.no_active')}
+          </div>
+        ) : (
         <div className="overflow-x-auto rounded-md border border-border">
           <Table dir={dir}>
             <TableHeader>
