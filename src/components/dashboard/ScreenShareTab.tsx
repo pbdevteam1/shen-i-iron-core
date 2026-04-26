@@ -17,6 +17,16 @@ import { toast } from '@/hooks/use-toast';
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
+interface WaitingRequest {
+  lookupCode?: string;
+  insertDate?: string;
+  formUrl?: string;
+  status?: string;
+  phoneNumber?: string;
+  emails?: string;
+  customerCity?: string;
+}
+
 interface Visitor {
   short_id?: string;
   unique_id?: string;
