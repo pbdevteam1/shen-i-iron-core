@@ -17,6 +17,16 @@ import { toast } from '@/hooks/use-toast';
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
+interface WaitingRequest {
+  lookupCode?: string;
+  insertDate?: string;
+  formUrl?: string;
+  status?: string;
+  phoneNumber?: string;
+  emails?: string;
+  customerCity?: string;
+}
+
 interface Visitor {
   short_id?: string;
   unique_id?: string;
@@ -81,11 +91,35 @@ const ScreenShareTab: React.FC = () => {
   const { t, dir } = useLanguage();
   const { user } = useAuth();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [waitingRequests, setWaitingRequests] = useState<WaitingRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [joiningId, setJoiningId] = useState<string | null>(null);
   const [, setTick] = useState(0);
+
+  const loadWaitingRequests = useCallback(async () => {
+    const token = getStoredToken();
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/WCP/getWaitingRequests`, {
+        method: 'GET',
+        headers: { realm: 'meieiron', 'access-token': token },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      const list: WaitingRequest[] = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.requests)
+          ? data.requests
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
+      setWaitingRequests(list);
+    } catch {
+      // silent — keeps existing list
+    }
+  }, []);
 
   const load = useCallback(async () => {
     const token = getStoredToken();
@@ -217,9 +251,13 @@ const ScreenShareTab: React.FC = () => {
 
   useEffect(() => {
     load();
-    const id = setInterval(load, POLL_INTERVAL);
+    loadWaitingRequests();
+    const id = setInterval(() => {
+      load();
+      loadWaitingRequests();
+    }, POLL_INTERVAL);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, loadWaitingRequests]);
 
   // Tick every second for wait-time counters
   useEffect(() => {
@@ -296,6 +334,7 @@ const ScreenShareTab: React.FC = () => {
   const align = dir === 'rtl' ? 'text-right' : 'text-left';
 
   return (
+    <div className="space-y-6">
     <Card className="border-border bg-card shadow-sm">
       <CardContent className="py-4">
         {/* Search + refresh */}
@@ -429,6 +468,79 @@ const ScreenShareTab: React.FC = () => {
         </div>
       </CardContent>
     </Card>
+
+    {/* Waiting requests table */}
+    <Card className="border-border bg-card shadow-sm">
+      <CardContent className="py-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-foreground">בקשות שממתינות לשיחה</h3>
+          <Badge variant="outline">{waitingRequests.length}</Badge>
+        </div>
+
+        {waitingRequests.length === 0 ? (
+          <div className="flex min-h-[120px] items-center justify-center text-sm text-muted-foreground">
+            אין בקשות ממתינות כרגע
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-md border border-border">
+            <Table dir={dir}>
+              <TableHeader>
+                <TableRow className="border-border bg-primary/10">
+                  <TableHead className={`${align} font-bold text-foreground`}>קוד זיהוי</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>תאריך פתיחה</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>טופס</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>סטטוס</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>טלפון</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>אימייל</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>עיר</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {waitingRequests.map((r, idx) => (
+                  <TableRow key={r.lookupCode || idx} className="hover:bg-muted/50">
+                    <TableCell className={`${align} font-mono text-xs text-foreground`}>
+                      {r.lookupCode || '—'}
+                    </TableCell>
+                    <TableCell className={`${align} text-xs text-muted-foreground`}>
+                      {r.insertDate ? new Date(r.insertDate).toLocaleString('he-IL') : '—'}
+                    </TableCell>
+                    <TableCell className={`${align} max-w-[200px]`}>
+                      {r.formUrl ? (
+                        <a
+                          href={r.formUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 truncate text-xs text-primary hover:underline"
+                          title={r.formUrl}
+                        >
+                          <ExternalLink className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{r.formUrl.replace(/^https?:\/\//, '')}</span>
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className={align}>
+                      <Badge variant="outline" className="text-xs">{r.status || '—'}</Badge>
+                    </TableCell>
+                    <TableCell className={`${align} font-mono text-xs text-foreground`}>
+                      {r.phoneNumber || '—'}
+                    </TableCell>
+                    <TableCell className={`${align} text-xs text-foreground`}>
+                      {r.emails || '—'}
+                    </TableCell>
+                    <TableCell className={`${align} text-sm text-muted-foreground`}>
+                      {r.customerCity || '—'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+    </div>
   );
 };
 
