@@ -108,6 +108,16 @@ const ScreenShareTab: React.FC = () => {
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [attachFormLink, setAttachFormLink] = useState(false);
+  const [waitingSearch, setWaitingSearch] = useState('');
+
+  const filteredWaitingRequests = useMemo(() => {
+    if (!waitingSearch.trim()) return waitingRequests;
+    const q = waitingSearch.trim().toLowerCase();
+    return waitingRequests.filter(r =>
+      [r.lookupCode, r.phoneNumber, r.emails, r.customerCity, r.formUrl, r.status, r.insertDate]
+        .some(f => f?.toString().toLowerCase().includes(q)),
+    );
+  }, [waitingRequests, waitingSearch]);
 
   const openEmailModal = (r: WaitingRequest) => {
     setEmailTarget(r);
@@ -489,7 +499,18 @@ const ScreenShareTab: React.FC = () => {
       <CardContent className="py-4">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h3 className="text-lg font-semibold text-foreground">בקשות שממתינות לשיחה</h3>
-          <Badge variant="outline">{waitingRequests.length}</Badge>
+          <Badge variant="outline">{filteredWaitingRequests.length}</Badge>
+        </div>
+
+        <div className="relative mb-4">
+          <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground`} />
+          <Input
+            placeholder="חיפוש לפי קוד, טלפון, מייל, עיר..."
+            value={waitingSearch}
+            onChange={(e) => setWaitingSearch(e.target.value)}
+            className={dir === 'rtl' ? 'pr-10' : 'pl-10'}
+            dir={dir}
+          />
         </div>
 
         {waitingRequests.length === 0 ? (
@@ -510,7 +531,7 @@ const ScreenShareTab: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {waitingRequests.map((r, idx) => {
+                {filteredWaitingRequests.map((r, idx) => {
                   const statusStr = String(r.status ?? '').trim();
                   const statusLabel = statusStr === '1' ? 'בוצע' : statusStr === '0' ? 'ממתין' : (statusStr || '—');
                   const statusClass =
