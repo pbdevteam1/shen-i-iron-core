@@ -109,6 +109,7 @@ const ScreenShareTab: React.FC = () => {
   const [emailBody, setEmailBody] = useState('');
   const [attachFormLink, setAttachFormLink] = useState(false);
   const [waitingSearch, setWaitingSearch] = useState('');
+  const [sending, setSending] = useState(false);
 
   const filteredWaitingRequests = useMemo(() => {
     if (!waitingSearch.trim()) return waitingRequests;
