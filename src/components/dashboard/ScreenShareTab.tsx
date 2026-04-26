@@ -595,20 +595,22 @@ const ScreenShareTab: React.FC = () => {
                     onCheckedChange={(c) => setAttachFormLink(c === true)}
                     className="mt-1"
                   />
-                  <div className="flex-1 space-y-1">
+                  <div className="flex-1 space-y-2">
                     <Label htmlFor="attach-form-link" className="cursor-pointer">
                       צרף קישור למייל
                     </Label>
-                    <a
-                      href={emailTarget.formUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 break-all text-xs text-primary hover:underline"
-                      dir="ltr"
-                    >
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      <span className="break-all">{emailTarget.formUrl}</span>
-                    </a>
+                    {attachFormLink && (
+                      <a
+                        href={emailTarget.formUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 break-all text-xs text-primary hover:underline"
+                        dir="ltr"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        <span className="break-all">{emailTarget.formUrl}</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
