@@ -157,10 +157,79 @@ const ScreenShareTab: React.FC = () => {
         `رابط النموذج: ${emailTarget.formUrl}`;
     }
 
+    // Detect language from current UI selection — defaults to RTL for he/ar.
+    const isRtl = language === 'he' || language === 'ar';
+    const htmlLang = language === 'ar' ? 'ar' : language === 'en' ? 'en' : 'he';
+    const htmlDir: 'rtl' | 'ltr' = isRtl ? 'rtl' : 'ltr';
+
+    const escapeHtml = (s: string) =>
+      s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    // Convert plain-text body (with \n) to safe HTML paragraphs.
+    // Auto-link URLs so the form link is clickable.
+    const linkify = (escaped: string) =>
+      escaped.replace(
+        /(https?:\/\/[^\s<]+)/g,
+        '<a href="$1" style="color:#0a7ea4;text-decoration:underline;" target="_blank" rel="noopener noreferrer">$1</a>',
+      );
+
+    const paragraphs = body
+      .split(/\n{2,}/)
+      .map(p => `<p style="margin:0 0 16px;line-height:1.6;">${linkify(escapeHtml(p)).replace(/\n/g, '<br/>')}</p>`)
+      .join('');
+
+    const fontFamily = isRtl
+      ? "'Segoe UI', Tahoma, Arial, sans-serif"
+      : "Arial, Helvetica, sans-serif";
+    const textAlign = isRtl ? 'right' : 'left';
+
+    const bodyHtml = `<!DOCTYPE html>
+<html lang="${htmlLang}" dir="${htmlDir}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(emailSubject)}</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;font-family:${fontFamily};color:#1a1a1a;" dir="${htmlDir}">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow:hidden;" dir="${htmlDir}">
+            <tr>
+              <td style="background-color:#0a7ea4;padding:20px 24px;text-align:${textAlign};">
+                <h1 style="margin:0;font-size:20px;color:#ffffff;font-weight:600;">מי עירון / مياه عيرون</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px;text-align:${textAlign};font-size:15px;color:#1a1a1a;" dir="${htmlDir}">
+                ${paragraphs}
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color:#f4f6f8;padding:16px 24px;text-align:${textAlign};font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;">
+                © ${new Date().getFullYear()} מי עירון · مياه عيرون
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
     const payload = {
       to: emailTarget.emails || '',
       subject: emailSubject,
       body,
+      bodyHtml,
+      contentType: 'text/html',
+      language: htmlLang,
+      direction: htmlDir,
       metadata: {
         lookupCode: emailTarget.lookupCode || '',
         phoneNumber: emailTarget.phoneNumber || '',
