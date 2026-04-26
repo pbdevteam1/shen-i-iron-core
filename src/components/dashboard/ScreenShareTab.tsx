@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Monitor, RefreshCw, Search, ExternalLink, Phone, Video } from 'lucide-react';
+import { Monitor, RefreshCw, Search, ExternalLink, Phone, Video, Mail } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
