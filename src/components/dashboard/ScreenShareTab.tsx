@@ -531,7 +531,7 @@ const ScreenShareTab: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {waitingRequests.map((r, idx) => {
+                {filteredWaitingRequests.map((r, idx) => {
                   const statusStr = String(r.status ?? '').trim();
                   const statusLabel = statusStr === '1' ? 'בוצע' : statusStr === '0' ? 'ממתין' : (statusStr || '—');
                   const statusClass =
