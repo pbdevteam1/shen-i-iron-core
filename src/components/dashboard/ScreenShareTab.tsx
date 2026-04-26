@@ -732,9 +732,9 @@ const ScreenShareTab: React.FC = () => {
                 </div>
               </div>
             )}
-            <Button className="w-full" onClick={handleSendEmail}>
+            <Button className="w-full" onClick={handleSendEmail} disabled={sending}>
               <Mail className="h-4 w-4" />
-              שלח
+              {sending ? 'שולח...' : 'שלח'}
             </Button>
           </div>
         )}
