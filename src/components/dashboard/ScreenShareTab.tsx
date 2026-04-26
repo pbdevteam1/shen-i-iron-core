@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Monitor, RefreshCw, Search, ExternalLink, Phone, Video, Mail } from 'lucide-react';
+import { Monitor, RefreshCw, Search, ExternalLink, Phone, Video, Mail, Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -524,7 +524,7 @@ const ScreenShareTab: React.FC = () => {
                 <TableRow className="border-border bg-primary/10">
                   <TableHead className={`${align} font-bold text-foreground`}>קוד זיהוי</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>תאריך פתיחה</TableHead>
-                  <TableHead className={`${align} font-bold text-foreground`}>זמן שעבר</TableHead>
+                  <TableHead className={`${align} font-bold text-foreground`}>זמן שעבר מפתיחה</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>סטטוס</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>עיר</TableHead>
                   <TableHead className={`${align} font-bold text-foreground`}>פעולות</TableHead>
@@ -541,18 +541,15 @@ const ScreenShareTab: React.FC = () => {
                         ? 'border-transparent bg-yellow-500/15 text-yellow-700 dark:text-yellow-400'
                         : '';
 
-                  // Elapsed time since insertDate
+                  // Elapsed time since insertDate (HH:MM total — no days unit)
                   let elapsedLabel = '—';
                   let isOverdue = false;
                   if (r.insertDate) {
-                    const totalSec = Math.max(0, Math.floor((Date.now() - new Date(r.insertDate).getTime()) / 1000));
-                    const days = Math.floor(totalSec / 86400);
-                    const hours = Math.floor((totalSec % 86400) / 3600);
-                    const minutes = Math.floor((totalSec % 3600) / 60);
-                    const seconds = totalSec % 60;
-                    if (days > 0) elapsedLabel = `${days} ימים ${hours}:${String(minutes).padStart(2, '0')}`;
-                    else elapsedLabel = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                    isOverdue = totalSec >= 86400;
+                    const totalMin = Math.max(0, Math.floor((Date.now() - new Date(r.insertDate).getTime()) / 60_000));
+                    const hours = Math.floor(totalMin / 60);
+                    const minutes = totalMin % 60;
+                    elapsedLabel = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                    isOverdue = totalMin >= 24 * 60;
                   }
 
                   return (
@@ -563,8 +560,17 @@ const ScreenShareTab: React.FC = () => {
                       <TableCell className={`${align} text-xs text-muted-foreground`}>
                         {r.insertDate ? new Date(r.insertDate).toLocaleString('he-IL') : '—'}
                       </TableCell>
-                      <TableCell className={`${align} font-mono text-xs ${isOverdue ? 'font-bold text-destructive' : 'text-muted-foreground'}`}>
-                        {elapsedLabel}
+                      <TableCell className={align}>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-xs tabular-nums ${
+                            isOverdue
+                              ? 'border-destructive/30 bg-destructive/10 font-semibold text-destructive'
+                              : 'border-border bg-muted/40 text-foreground'
+                          }`}
+                        >
+                          <Clock className="h-3 w-3" />
+                          {elapsedLabel}
+                        </span>
                       </TableCell>
                       <TableCell className={align}>
                         <Badge variant="outline" className={`text-xs ${statusClass}`}>{statusLabel}</Badge>
